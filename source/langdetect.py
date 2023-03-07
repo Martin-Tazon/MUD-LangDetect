@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
 
     #Compute text features
-    features, X_train_raw, X_test_raw, foo = compute_features(X_train, 
+    features, X_train_raw, X_test_raw = compute_features(X_train, 
                                                             X_test, 
                                                             analyzer=args.analyzer, 
                                                             max_features=args.voc_size)
