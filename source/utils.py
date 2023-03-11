@@ -138,7 +138,7 @@ def plot_Confusion_Matrix(y_test, y_predict, color="Blues"):
 
 lang_mark = {'Romanian':(".","r"), 'Pushto':(",","g"), 'Russian':("o","b"), 'Urdu':("v","c"), 'Dutch':("^","m"), 'Latin':("<","y"), 'Spanish':(">","k"), 'Indonesian':(".","g"), 'Korean':(",","b"), 'French':("o","c"), 'English':("v","m"), 'Swedish':("^","y"), 'Tamil':("<","k"), 'Hindi':(">","r"), 'Estonian':(".","b"), 'Persian':(",","c"), 'Thai':("o","m"), 'Portugese':("v","y"), 'Chinese':("^","k"), 'Arabic':("<","r"), 'Japanese':(">","g"), 'Turkish':(".","c")}
 
-def plotPCA(x_train, x_test,y_test, langs, markers=lang_mark):
+def plotPCA(x_train, x_test,y_test, langs, markers=lang_mark, highlights=None, alpha_other=0.1):
 	'''
 	Task: Given train features train a PCA dimensionality reduction
 		  (2 dimensions) and plot the test set according to its labels.
@@ -152,18 +152,21 @@ def plotPCA(x_train, x_test,y_test, langs, markers=lang_mark):
 			Plot PCA results by language
 			
 	'''
+	if highlights is None:
+		highlights = langs
 	pca = PCA(n_components=2)
 	pca.fit(toNumpyArray(x_train))
 	pca_test = pca.transform(toNumpyArray(x_test))
 	print('Variance explained by PCA:', pca.explained_variance_ratio_)
 	y_test_list = np.asarray(y_test.tolist())
 	for lang in langs:
+		if lang in highlights: 
+			al = 1
+		else:
+			al = alpha_other
 		pca_x = np.asarray([i[0] for i in pca_test])[y_test_list == lang]
 		pca_y = np.asarray([i[1] for i in pca_test])[y_test_list == lang]
 		if lang in markers:
-			plt.scatter(pca_x,pca_y, label=lang, marker=markers[lang][0],color=markers[lang][1])
+			plt.scatter(pca_x,pca_y, label=lang, marker=markers[lang][0],color=markers[lang][1], alpha = al)
 	plt.legend(loc="upper right")
 	plt.show()
-
-
-
