@@ -4,6 +4,7 @@ from sklearn.decomposition import PCA
 import seaborn as sn
 import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt
+import seaborn as sns
 from sklearn.feature_extraction.text import CountVectorizer
 import scipy
 import numpy as np
@@ -170,3 +171,51 @@ def plotPCA(x_train, x_test,y_test, langs, markers=lang_mark, highlights=None, a
 			plt.scatter(pca_x,pca_y, label=lang, marker=markers[lang][0],color=markers[lang][1], alpha = al)
 	plt.legend(loc="upper right")
 	plt.show()
+
+def word_char_uniqchar(raw):
+	dfs = []
+	dfdata = []
+		
+	# words
+	dfdata.append(dfs.append(raw.groupby("language").apply(lambda x: x["Text"].str.split(" ").apply(len))))
+	#dfs.append(raw.groupby("language").apply(lambda x: x["Text"].str.split(" ").apply(len).mean()))
+	dfs.append(raw.groupby("language").apply(lambda x: x["Text"].str.split(" ").apply(len).std()))
+
+	# chars
+	dfdata.append(dfs.append(raw.groupby("language").apply(lambda x: x["Text"].apply(list).apply(len))))
+	#dfs.append(raw.groupby("language").apply(lambda x: x["Text"].apply(list).apply(len).mean()))
+	#dfs.append(raw.groupby("language").apply(lambda x: x["Text"].apply(list).apply(len).std()))
+
+	# Unique chars
+	dfdata.append(dfs.append(raw.groupby("language").apply(lambda x: x["Text"].apply(set).apply(len))))
+	#dfs.append(raw.groupby("language").apply(lambda x: x["Text"].apply(set).apply(len).mean()))
+	#dfs.append(raw.groupby("language").apply(lambda x: x["Text"].apply(set).apply(len).std()))
+
+	#return pd.concat(dfs,axis=1).rename(columns={0:"word mean",1:"word std", 2:"char mean", 3:"char std", 4:"uniq char mean", 5:"uniq char std"}).round(2)
+	return dfdata
+
+
+def plot_unichar_vs_word(raw,markers=lang_mark, highlights=None, alpha_other=0.1):
+	dd = word_char_uniqchar(raw)
+	
+	ddwords = raw.groupby("language").apply(lambda x: x["Text"].str.split(" ").apply(len))
+	dduchar = raw.groupby("language").apply(lambda x: x["Text"].apply(set).apply(len))
+	dw = ddwords.reset_index().rename(columns={"Text":"word"})
+	du = dduchar.reset_index().rename(columns={"Text":"uni_char"}).drop(columns=["language"])
+	df = pd.concat([dw,du],axis=1)
+	
+	#if highlights is None:
+	#	highlights = lang_mark.keys
+	#for lang in df["language"]:
+	#	if lang in highlights: 
+	#		al = 1
+	#	else:
+	#		al = alpha_other
+	#	_x = df[df["language"]==lang]["uni_char"]
+	#	_y = df[df["language"]==lang]["word"]
+	#	plt.scatter(x="word", y="uni_char", label=lang, marker=markers[lang][0], color=markers[lang][1], alpha = al) 
+	sns.scatterplot(data=df,x="uni_char",y="word",hue="language",linewidth=0)
+	plt.show()
+
+	return df
+
